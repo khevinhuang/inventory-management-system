@@ -1,0 +1,81 @@
+<mat-card>
+  <mat-card-title>{{ title }}</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+      <div class="addForm">
+        <mat-form-field>
+          <input
+            type="text"
+            matInput
+            placeholder="Item Name"
+            formControlName="itemName"
+          />
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            type="text"
+            matInput
+            placeholder="Description"
+            formControlName="description"
+          />
+        </mat-form-field>
+      </div>
+      <div class="addForm">
+        <mat-form-field>
+          <input
+            type="currency"
+            matInput
+            placeholder="Price"
+            formControlName="price"
+          />
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            type="number"
+            matInput
+            placeholder="Stock"
+            formControlName="stock"
+          />
+        </mat-form-field>
+      </div>
+      <div class="addForm">
+        <mat-form-field>
+          <input
+            type="text"
+            matInput
+            placeholder="Supplier Name"
+            formControlName="supplierName"
+          />
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            type="text"
+            matInput
+            placeholder="Supplier Contact"
+            formControlName="supplierContact"
+          />
+        </mat-form-field>
+      </div>
+
+      <mat-error class="error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </mat-error>
+
+      <div class="button">
+        <button *ngIf="!isHide" [disabled]="submitting" class="btn btn-success">
+          <span
+            *ngIf="submitting"
+            class="spinner-border spinner-border-sm me-1"
+          ></span>
+          Save
+        </button>
+        <button *ngIf="!isHide" class="btn btn-danger" (click)="onCancel()">
+          Cancel
+        </button>
+        <button *ngIf="isHide" class="btn btn-danger" (click)="onCancel()">
+          Close
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

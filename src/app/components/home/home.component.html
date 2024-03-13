@@ -1,0 +1,284 @@
+<section>
+  <div class="navButtonRow">
+    <button mat-button color="primary" routerLink="/">Home</button>
+    <button mat-button color="warn" (click)="logout()">Logout</button>
+  </div>
+</section>
+
+<mat-card>
+  <mat-card-title>
+    <label class="title">
+      <h1>{{ user?.role }}!</h1>
+    </label>
+    <br />
+  </mat-card-title>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Alert Stock & Sales Reporting">
+        <br />
+        <button class="btn btn-sm btn-primary" (click)="onShowAlert()">
+          Show Alert
+        </button>
+        <button class="btn btn-sm btn-primary" (click)="onShowReport()">
+          Show Report
+        </button>
+        <br />
+        <div *ngIf="showAlert">
+          <input
+            class="form-control"
+            style="width: 12%"
+            type="number"
+            matInput
+            placeholder="Limit Stock"
+            [value]="limitStock"
+            (change)="onLimitStockChange($event)"
+          />
+          <mat-list *ngFor="let alert of alerts">
+            <mat-list-item [ngClass]="cssClass(alert.stock)"
+              >This {{ alert.itemName }} has stock under {{ limitStock }}.
+              Current stock is {{ alert.stock }} restock</mat-list-item
+            >
+          </mat-list>
+        </div>
+        <br />
+        <div *ngIf="showReport" class="mat-elevation-z8">
+          <table mat-table [dataSource]="reportingDataSource" matSort>
+            <ng-container matColumnDef="itemName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Item Name
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.itemName }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="qtySold">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Quantity Sold
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.qtySold }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.price }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dateOfSale">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Date of Sale
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.dateOfSale }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.total }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="reportDisplayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: reportDisplayedColumns"
+            ></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td
+                class="mat-cell"
+                colspan="8"
+                style="text-align: center; padding: 50px"
+              >
+                Data not found "{{ input.value }}"
+              </td>
+            </tr>
+          </table>
+
+          <mat-paginator
+            #reportPaginator
+            [pageSizeOptions]="[5, 10, 25, 100]"
+          ></mat-paginator>
+        </div>
+      </mat-tab>
+      <mat-tab label="Supplier View">
+        <div>
+          <br />
+          <h2>Supplier List</h2>
+          <br />
+        </div>
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="supplierDataSource" matSort>
+            <ng-container matColumnDef="supplierName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Supplier Name
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.supplierName }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="supplierContact">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Supplier Contact
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.supplierContact }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Description
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.description }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="itemName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Item Name
+              </th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.itemName }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="supplierDisplayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: supplierDisplayedColumns"
+            ></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td
+                class="mat-cell"
+                colspan="8"
+                style="text-align: center; padding: 50px"
+              >
+                Data not found "{{ input.value }}"
+              </td>
+            </tr>
+          </table>
+
+          <mat-paginator
+            #supplierPaginator
+            [pageSizeOptions]="[5, 10, 25, 100]"
+          ></mat-paginator>
+        </div>
+      </mat-tab>
+      <mat-tab label="Store View">
+        <div>
+          <br />
+          <h2>Store Item</h2>
+          <button
+            class="btn btn-sm btn-success"
+            routerLink="/add-store-item"
+            [hidden]="isDisabledButtonDelete"
+            [disabled]="isDisabledButtonDelete"
+          >
+            Add Store Item
+          </button>
+          <br />
+        </div>
+        <mat-form-field>
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            (keyup)="applyFilter($event)"
+            placeholder="Searching . . ."
+            #input
+          />
+        </mat-form-field>
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="storeDataSource" matSort>
+            <ng-container matColumnDef="itemName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Item Name
+              </th>
+              <td mat-cell *matCellDef="let row" (click)="goItemDetail(row.id)">
+                {{ row.itemName }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                Description
+              </th>
+              <td mat-cell *matCellDef="let row" (click)="goItemDetail(row.id)">
+                {{ row.description }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+              <td mat-cell *matCellDef="let row" (click)="goItemDetail(row.id)">
+                {{ row.price }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="stock">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Stock</th>
+              <td mat-cell *matCellDef="let row" (click)="goItemDetail(row.id)">
+                {{ row.stock }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Action</th>
+              <td mat-cell *matCellDef="let row">
+                <button
+                  class="btn btn-sm btn-warning me-1"
+                  (click)="onEdit(row.id)"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-sm btn-danger btn-delete-user"
+                  (click)="deleteUser(row.id)"
+                  [hidden]="isDisabledButtonDelete"
+                  [disabled]="isDisabledButtonDelete"
+                >
+                  <span>Delete</span>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="storeDisplayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: storeDisplayedColumns"
+            ></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td
+                class="mat-cell"
+                colspan="8"
+                style="text-align: center; padding: 50px"
+              >
+                Data not found "{{ input.value }}"
+              </td>
+            </tr>
+          </table>
+
+          <mat-paginator
+            #storePaginator
+            [pageSizeOptions]="[5, 10, 25, 100]"
+          ></mat-paginator>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+  <mat-card-footer class="footer">
+    <label>
+      Copyright by Kevin Huang - Frontend Developer Angular and Ionic
+    </label>
+  </mat-card-footer>
+</mat-card>
